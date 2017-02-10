@@ -5,11 +5,9 @@
  */
 package movielist01;
 
-import java.sql.DriverManager;
-import java.sql.Connection;
+//import org.json.simple.JSONObject;
 
-import java.util.Calendar;
-import java.sql.*;
+
 /**
  *
  * @author Sammy Guergachi <sguergachi at gmail.com>
@@ -19,9 +17,11 @@ public class MovieList01 {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        User u = new User();
-        u.userDesign();
+    public static void main(String[] args) {    
+        //User u = new User();
+        PanelUi panel = new PanelUi();
+        //u.userDesign();
+        panel.design();
     }
     
 }

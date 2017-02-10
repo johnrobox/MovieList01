@@ -2,10 +2,9 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
-* Link : http://stackoverflow.com/questions/2839321/connect-java-to-a-mysql-database
  */
 
-package movielist01;
+package Config;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,9 +13,9 @@ import java.util.Properties;
 
 /**
  * 
- * @author Sammy Guergachi <sguergachi at gmail.com>
+ * @author Roy <johnrobertjerodiaz@gmail.com>
  */
-public class MysqlConnect {
+public class Database {
     
     private static final String DATABASE_DRIVER = "com.mysql.jdbc.Driver";
     private static final String DATABASE_URL = "jdbc:mysql://localhost:3306/JavaProject";
@@ -47,7 +46,7 @@ public class MysqlConnect {
                 Class.forName(DATABASE_DRIVER);
                 connection = DriverManager.getConnection(DATABASE_URL, getProperties());
             } catch (ClassNotFoundException | SQLException e) {
-                
+                System.out.println(e.getMessage());
             }
         }
         return connection;
@@ -60,7 +59,7 @@ public class MysqlConnect {
                 connection.close();
                 connection = null;
             } catch (SQLException e) {
-                
+                System.out.println(e.getMessage());
             }
         }
     }

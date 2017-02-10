@@ -5,6 +5,11 @@
  */
 package movielist01;
 
+import Helper.Helper;
+import Model.DbModel;
+import java.sql.ResultSet;
+import javax.swing.table.DefaultTableModel;
+import org.json.JSONObject;
 /**
  *
  * @author Sammy Guergachi <sguergachi at gmail.com>
@@ -14,8 +19,19 @@ public class User extends javax.swing.JFrame {
     /**
      * Creates new form User
      */
+    Boolean response = false;
+    
+    DbModel execs = new DbModel();
+    Helper helper = new Helper();
+    
+    int user_id = 0;
+    String firstname = "";
+    String lastname = "";
+    String address = "";
+    
     public User() {
         initComponents();
+        userTable();
     }
 
     /**
@@ -32,15 +48,19 @@ public class User extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         firstname_field = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         address_field = new javax.swing.JTextField();
-        gender_field = new javax.swing.JTextField();
-        age_field = new javax.swing.JTextField();
         lastname_field = new javax.swing.JTextField();
         clear_button = new javax.swing.JButton();
         register_button = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        user_list_table = new javax.swing.JTable();
+        update_button = new javax.swing.JButton();
+        delete_button = new javax.swing.JButton();
+        fistname_error_field = new javax.swing.JLabel();
+        lastname_error_field = new javax.swing.JLabel();
+        address_error_field = new javax.swing.JLabel();
+        show_movies_button = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -59,21 +79,65 @@ public class User extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jLabel3.setText("Lastname");
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel4.setText("Age");
-
-        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel5.setText("Gender");
-
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jLabel6.setText("Address");
 
         clear_button.setText("Clear ");
+        clear_button.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clear_buttonActionPerformed(evt);
+            }
+        });
 
-        register_button.setText("Register");
+        register_button.setText("Submit");
         register_button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 register_buttonActionPerformed(evt);
+            }
+        });
+
+        user_list_table.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Number", "Firstname", "Lastname", "Address"
+            }
+        ));
+        user_list_table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                user_list_tableMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(user_list_table);
+
+        update_button.setText("Edit");
+        update_button.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                update_buttonActionPerformed(evt);
+            }
+        });
+
+        delete_button.setText("Delete");
+        delete_button.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                delete_buttonActionPerformed(evt);
+            }
+        });
+
+        fistname_error_field.setForeground(new java.awt.Color(255, 0, 51));
+
+        lastname_error_field.setForeground(new java.awt.Color(255, 0, 51));
+
+        address_error_field.setForeground(new java.awt.Color(255, 0, 51));
+
+        show_movies_button.setText("Show Movies");
+        show_movies_button.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                show_movies_buttonActionPerformed(evt);
             }
         });
 
@@ -85,67 +149,75 @@ public class User extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(78, 78, 78)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel2)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel6)
+                                .addComponent(jLabel3)
+                                .addComponent(clear_button, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jLabel2))
+                                .addGap(4, 4, 4)
+                                .addComponent(register_button, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(update_button)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(delete_button)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(show_movies_button))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(64, 64, 64)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(firstname_field)
-                                    .addComponent(lastname_field, javax.swing.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel6)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel4))
-                                .addGap(85, 85, 85)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(gender_field)
-                                    .addComponent(age_field)
-                                    .addComponent(address_field)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(clear_button, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
-                                        .addComponent(register_button, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(8, 8, 8))))))
+                                    .addComponent(fistname_error_field)
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                            .addComponent(lastname_field, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
+                                            .addComponent(address_field))
+                                        .addComponent(firstname_field, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(address_error_field))
+                                    .addComponent(lastname_error_field)))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(165, 165, 165)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(288, Short.MAX_VALUE))
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(301, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 77, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 684, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(46, 46, 46))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(46, 46, 46)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(44, 44, 44)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(firstname_field, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(lastname_field, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                        .addGap(1, 1, 1))
-                    .addComponent(jLabel3))
-                .addGap(31, 31, 31)
+                .addComponent(fistname_error_field)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(age_field, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(29, 29, 29)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(firstname_field, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lastname_error_field)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(gender_field)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(33, 33, 33)
+                    .addComponent(lastname_field)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGap(5, 5, 5)
+                .addComponent(address_error_field)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(address_field, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(address_field, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(49, 49, 49)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(clear_button, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(register_button, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(30, 30, 30))
+                    .addComponent(clear_button)
+                    .addComponent(register_button)
+                    .addComponent(update_button)
+                    .addComponent(delete_button)
+                    .addComponent(show_movies_button))
+                .addGap(46, 46, 46)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -155,7 +227,7 @@ public class User extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(26, 26, 26)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(28, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -174,71 +246,190 @@ public class User extends javax.swing.JFrame {
 
     private void register_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_register_buttonActionPerformed
         // TODO add your handling code here:
-        String firstname = firstname_field.getText();
-        String lastname = lastname_field.getText();
-        //int age = age_field.getText();
-        String gender = gender_field.getText();
-        String address = address_field.getText();
-        DbModel execs = new DbModel();
-        execs.insertData(firstname, lastname, 2, 3, address);
+        firstname = firstname_field.getText();
+        lastname = lastname_field.getText();
+        address = address_field.getText();
+        clearError();
+        boolean error = checkEmpty();
+        if (error == false) {
+            JSONObject user_obj = new JSONObject();
+            user_obj.put("firstname", firstname);
+            user_obj.put("lastname", lastname);
+            user_obj.put("address", address);
+            response = execs.insertData("users", user_obj);
+            if (response == true) {
+                clearError();
+                clearField();
+                userTable();
+                helper.getAlert("ALERT", "User successfully added!", 1);
+            } else {
+                helper.getAlert("ALERT", "Cannot process request! Please try again", 0);
+            }
+            
+        }
     }//GEN-LAST:event_register_buttonActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+    
+    private void clear_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clear_buttonActionPerformed
+        // TODO add your handling code here:
+        clearField();
+    }//GEN-LAST:event_clear_buttonActionPerformed
+
+    
+    private void update_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_update_buttonActionPerformed
+        // TODO add your handling code here:
+        firstname = firstname_field.getText();
+        lastname = lastname_field.getText();
+        address = address_field.getText();
+        clearError();
+        boolean error = checkEmpty();
+        if (error == false) {
+            clearError();
+            JSONObject user_obj = new JSONObject();
+            user_obj.put("firstname", firstname);
+            user_obj.put("lastname", lastname);
+            user_obj.put("address", address);
+
+            response = execs.updateData("users", user_id, user_obj);
+            if (response == true) {
+                address_field.setText("");
+                lastname_field.setText("");
+                firstname_field.setText("");
+                clearError();
+                userTable();
+                helper.getAlert("ALERT", "User successfully updated!", 1);
+            } else {
+                helper.getAlert("ALERT", "Cannot process request! Please try again", 0);
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(User.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(User.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(User.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(User.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
+    }//GEN-LAST:event_update_buttonActionPerformed
 
-        
+    private void user_list_tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_user_list_tableMouseClicked
+        // TODO add your handling code here:
+        DefaultTableModel model = (DefaultTableModel)user_list_table.getModel();
+        Object data = model.getDataVector().elementAt(user_list_table.getSelectedRow());
+        int row = user_list_table.getSelectedRow();
+        user_id = (int)model.getValueAt(row, 0);
+        String urser_firstname = (String)model.getValueAt(row, 1);
+        String user_lastname = (String)model.getValueAt(row, 2);
+        String user_address = (String)model.getValueAt(row, 3);
+        address_field.setText(user_address);
+        lastname_field.setText(user_lastname);
+        firstname_field.setText(urser_firstname);
+    }//GEN-LAST:event_user_list_tableMouseClicked
+
+    private void delete_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delete_buttonActionPerformed
+        // TODO add your handling code here:
+        response = execs.deleteData("users", user_id);
+        if (response == true) {
+            address_field.setText("");
+            lastname_field.setText("");
+            firstname_field.setText("");
+            userTable();
+            user_id = 0;
+            helper.getAlert("ALERT", "User successfully deleted!", 1);
+        } else {
+            helper.getAlert("ALERT", "Cannot process request! Please try again", 0);
+        }
+    }//GEN-LAST:event_delete_buttonActionPerformed
+
+    private void show_movies_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_show_movies_buttonActionPerformed
+        // TODO add your handling code here:
+        if (user_id == 0) {
+            helper.getAlert("ALERT", "Please select user! Cannot complete request", 0);
+        } else {
+            
+        }
+    }//GEN-LAST:event_show_movies_buttonActionPerformed
+
+
+    private boolean checkEmpty() {
+        boolean error = false;
+        String base_message = "  is required!";
+        if (firstname.matches("") || firstname == "" || firstname == null) {
+            fistname_error_field.setText("Firstname" + base_message);
+            error = true;
+        }
+        if (lastname.matches("") || lastname == "" || lastname == null) {
+            lastname_error_field.setText("Lastname" + base_message);
+            error = true;
+        }
+        if (address.matches("") || address == "" || address == null) {
+            address_error_field.setText("Address" + base_message);
+            error = true;
+        }
+        return error;
     }
-
+    
+    
+    private void clearField() {
+        address_field.setText("");
+        lastname_field.setText("");
+        firstname_field.setText("");
+    }
+    
+    private void clearError() {
+        fistname_error_field.setText("");
+        lastname_error_field.setText("");
+        address_error_field.setText("");
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel address_error_field;
     private javax.swing.JTextField address_field;
-    private javax.swing.JTextField age_field;
     private javax.swing.JButton clear_button;
+    private javax.swing.JButton delete_button;
     private javax.swing.JTextField firstname_field;
-    private javax.swing.JTextField gender_field;
+    private javax.swing.JLabel fistname_error_field;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lastname_error_field;
     private javax.swing.JTextField lastname_field;
     private javax.swing.JButton register_button;
+    private javax.swing.JButton show_movies_button;
+    private javax.swing.JButton update_button;
+    private javax.swing.JTable user_list_table;
     // End of variables declaration//GEN-END:variables
 
     
-    public static void userDesign() {
+    public void userDesign() {
         /* Create and display the form */
+        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new User().setVisible(true);
+                
             }
-        });
+        });   
         
-        
+    }
+    
+    
+    public void userTable() {
+        String[] columnNames = {"Number", "Firstname", "Lastname", "Address"};
+        int user_number = 0;
+        String user_firstname = "";
+        String user_lastname = "";
+        String user_address = "";
+        ResultSet response = execs.fetchData("users");
+        DefaultTableModel model = new DefaultTableModel();
+        model.setColumnIdentifiers(columnNames);
+        user_list_table.setModel(model);
+        try {
+            while ( response.next() ) {
+                String lastName = response.getString("firstname");
+                user_number = response.getInt("id");
+                user_firstname = response.getString("firstname");
+                user_lastname = response.getString("lastname");
+                user_address = response.getString("address");
+                model.addRow(new Object[]{user_number, user_firstname, user_lastname, user_address});
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
